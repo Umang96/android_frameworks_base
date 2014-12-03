@@ -26,6 +26,8 @@ import android.app.Fragment;
 import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.pm.ResolveInfo;
+import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -33,6 +35,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.PowerManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.FloatProperty;
 import android.util.MathUtils;
@@ -250,9 +256,12 @@ public class NotificationPanelView extends PanelView implements
     private ValueAnimator mDarkAnimator;
     private StatusBarKeyguardViewManager mStatusBarKeyguardViewManager;
     private boolean mUserSetupComplete;
+    private Handler mHandler = new Handler();
+    private SettingsObserver mSettingsObserver;
 
     private int mOneFingerQuickSettingsIntercept;
     private boolean mDoubleTapToSleepEnabled;
+    private int mQsSmartPullDown;
     private int mStatusBarHeaderHeight;
     private GestureDetector mDoubleTapGesture;
 
@@ -261,6 +270,7 @@ public class NotificationPanelView extends PanelView implements
         setWillNotDraw(!DEBUG);
         mFalsingManager = FalsingManager.getInstance(context);
         mPowerManager = context.getSystemService(PowerManager.class);
+	mSettingsObserver = new SettingsObserver(mHandler);
         mDoubleTapGesture = new GestureDetector(mContext,
                 new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -303,6 +313,7 @@ public class NotificationPanelView extends PanelView implements
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+	mSettingsObserver.observe();
         FragmentHostManager.get(this).addTagListener(QS.TAG, mFragmentListener);
         Dependency.get(TunerService.class).addTunable(this,
                 STATUS_BAR_QUICK_QS_PULLDOWN,
@@ -312,6 +323,7 @@ public class NotificationPanelView extends PanelView implements
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+	mSettingsObserver.unobserve();
         FragmentHostManager.get(this).removeTagListener(QS.TAG, mFragmentListener);
         Dependency.get(TunerService.class).removeTunable(this);
     }
@@ -976,6 +988,12 @@ public class NotificationPanelView extends PanelView implements
                 break;
         }
         showQsOverride &= mStatusBarState == StatusBarState.SHADE;
+
+        if (mQsSmartPullDown == 1 && !mStatusBar.hasActiveClearableNotifications()
+                || mQsSmartPullDown == 2 && !mStatusBar.hasActiveOngoingNotifications()
+                || mQsSmartPullDown == 3 && !mStatusBar.hasActiveVisibleNotifications()) {
+                showQsOverride = true;
+        }
 
         return twoFingerDrag || showQsOverride || stylusButtonClickDrag || mouseButtonClickDrag;
     }
@@ -2625,6 +2643,40 @@ public class NotificationPanelView extends PanelView implements
         }
     };
 
+    class SettingsObserver extends ContentObserver {
+         SettingsObserver(Handler handler) {
+             super(handler);
+         }
+ 
+         void observe() {
+             ContentResolver resolver = mContext.getContentResolver();
+           resolver.registerContentObserver(Settings.System.getUriFor(
+                    "qs_smart_pulldown"), false, this, UserHandle.USER_ALL);
+              update();
+          }
+
+         void unobserve() {
+             ContentResolver resolver = mContext.getContentResolver();
+             resolver.unregisterContentObserver(this);
+         }
+
+         @Override
+         public void onChange(boolean selfChange) {
+             update();
+         }
+ 
+         @Override
+         public void onChange(boolean selfChange, Uri uri) {
+             update();
+         }
+
+         public void update() {
+             ContentResolver resolver = mContext.getContentResolver();
+            mQsSmartPullDown = Settings.System.getIntForUser(resolver,
+                    "qs_smart_pulldown", 0, UserHandle.USER_CURRENT);
+          }
+      }
+
     @Override
     public void setTouchDisabled(boolean disabled) {
         super.setTouchDisabled(disabled);
@@ -2722,6 +2774,6 @@ public class NotificationPanelView extends PanelView implements
                 break;
             default:
                 break;
-        }
     }
+}
 }

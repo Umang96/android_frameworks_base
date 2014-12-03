@@ -2300,7 +2300,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     /**
      * Return whether there are any clearable notifications
-     */
+     
     private boolean hasActiveClearableNotifications() {
         int childCount = mStackScroller.getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -2313,7 +2313,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             }
         }
         return false;
-    }
+    }*/
 
     private void updateEmptyShadeView() {
         boolean showEmptyShadeView =
@@ -2353,6 +2353,18 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     public void requestNotificationUpdate() {
         updateNotifications();
+    }
+
+    protected boolean hasActiveVisibleNotifications() {
+        return mNotificationData.hasActiveVisibleNotifications();
+    }
+
+    protected boolean hasActiveOngoingNotifications() {
+        return mNotificationData.hasActiveOngoingNotifications();
+    }
+
+    protected boolean hasActiveClearableNotifications() {
+        return mNotificationData.hasActiveClearableNotifications();
     }
 
     protected void setAreThereNotifications() {
