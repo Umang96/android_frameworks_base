@@ -2056,5 +2056,10 @@
      can't verify user consent. [CHAR LIMIT=NONE] -->
     <string name="touch_filtered_warning">Because an app is obscuring a permission request, Settings
         can’t verify your response.</string>
+        
+    <!-- Reboot/Recovery QS Tile -->
+    <string name="quick_settings_reboot_label">Reboot</string>
+    <string name="quick_settings_reboot_recovery_label">Recovery</string>
+
 
 </resources>
