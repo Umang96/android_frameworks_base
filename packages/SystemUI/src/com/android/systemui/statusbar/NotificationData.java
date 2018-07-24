@@ -130,6 +130,10 @@ public class NotificationData {
             return SystemClock.elapsedRealtime() < lastFullScreenIntentLaunchTime + LAUNCH_COOLDOWN;
         }
 
+        public View getContentView() {
+            return row.getPrivateLayout().getContractedChild();
+        }
+
         /**
          * Create the icons for a notification
          * @param context the context to create the icons with
