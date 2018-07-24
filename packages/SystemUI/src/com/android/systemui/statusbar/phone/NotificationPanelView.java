@@ -261,7 +261,7 @@ public class NotificationPanelView extends PanelView implements
 
     private int mOneFingerQuickSettingsIntercept;
     private boolean mDoubleTapToSleepEnabled;
-    private int mQsSmartPullDown;
+    private int mQsSmartPullDown = 3;
     private int mStatusBarHeaderHeight;
     private GestureDetector mDoubleTapGesture;
 
@@ -2673,7 +2673,7 @@ public class NotificationPanelView extends PanelView implements
          public void update() {
              ContentResolver resolver = mContext.getContentResolver();
             mQsSmartPullDown = Settings.System.getIntForUser(resolver,
-                    "qs_smart_pulldown", 0, UserHandle.USER_CURRENT);
+                    "qs_smart_pulldown", 3, UserHandle.USER_CURRENT);
           }
       }
 
