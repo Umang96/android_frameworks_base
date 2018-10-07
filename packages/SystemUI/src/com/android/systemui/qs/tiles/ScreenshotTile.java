@@ -35,6 +35,7 @@ import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 import com.android.systemui.screenshot.TakeScreenshotService;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import org.lineageos.internal.logging.LineageMetricsLogger;
 
 /** Quick settings tile: Screenshot **/
 public class ScreenshotTile extends QSTileImpl<BooleanState> {
@@ -101,7 +102,7 @@ public class ScreenshotTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.CUSTOM_QUICK_TILES;
+        return LineageMetricsLogger.TILE_READING_MODE + 7;
     }
 
     final Runnable mScreenshotTimeout = new Runnable() {

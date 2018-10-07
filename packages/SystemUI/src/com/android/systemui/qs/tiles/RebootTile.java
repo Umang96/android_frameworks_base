@@ -27,6 +27,7 @@ import com.android.systemui.R;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
+import org.lineageos.internal.logging.LineageMetricsLogger;
 
 public class RebootTile extends QSTileImpl<BooleanState> {
 
@@ -72,7 +73,7 @@ public class RebootTile extends QSTileImpl<BooleanState> {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsEvent.CUSTOM_QUICK_TILES;
+        return LineageMetricsLogger.TILE_READING_MODE + 8;
     }
 
     @Override
